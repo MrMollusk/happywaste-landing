@@ -29,7 +29,8 @@ export default function Dashboard() {
   // mock tunnel state
   const level = 3.2;
   const volume = 10955;
-  const inflow15 = 1450;
+  const inflow15 = 1450; // m³ / 15 min (raw)
+  const inflowM3h = inflow15 * 4; // converted to m³ / h
   const predictedLevel15 = 3.0;
   const predictedLevel60 = 2.7;
   const flushedToday = true;
@@ -40,9 +41,11 @@ export default function Dashboard() {
   const energyThisDayMWh = 18.3;
   const costThisDay = 5320;
 
-  const bigPower = pumps.filter(p => p.kind === 'big' && p.isOn)
+  const bigPower = pumps
+    .filter(p => p.kind === 'big' && p.isOn)
     .reduce((s, p) => s + p.powerKw, 0);
-  const smallPower = pumps.filter(p => p.kind === 'small' && p.isOn)
+  const smallPower = pumps
+    .filter(p => p.kind === 'small' && p.isOn)
     .reduce((s, p) => s + p.powerKw, 0);
   const powerTotal = bigPower + smallPower || 1;
   const bigShare = (bigPower / powerTotal) * 100;
@@ -89,7 +92,9 @@ export default function Dashboard() {
         <span className="constraint-chip ok">Level safe · 0–8 m</span>
         <span className="constraint-chip ok">Wear balanced</span>
         <span className="constraint-chip ok">Switching within limits</span>
-        <span className="constraint-chip ok">≤ 5 big pumps (now {bigOn})</span>
+        <span className="constraint-chip ok">
+          F2 {totalFlow.toLocaleString(undefined, { maximumFractionDigits: 0 })} m³/h · limit 16 000
+        </span>
         <span className={`constraint-chip ${flushedToday ? 'ok' : 'warn'}`}>
           Flush {flushedToday ? 'done today' : 'pending'}
         </span>
@@ -111,9 +116,17 @@ export default function Dashboard() {
                 <span className="label">L1 (0–8 m)</span>
               </div>
               <div className="tunnel-meta">
-                <div>Volume: <strong>{volume.toLocaleString()} m³</strong></div>
-                <div>Predicted in 15 min: <strong>{predictedLevel15.toFixed(1)} m</strong></div>
-                <div>Predicted in 1 h: <strong>{predictedLevel60.toFixed(1)} m</strong></div>
+                <div>
+                  Volume: <strong>{volume.toLocaleString()} m³</strong>
+                </div>
+                <div>
+                  Predicted in 15 min:{' '}
+                  <strong>{predictedLevel15.toFixed(1)} m</strong>
+                </div>
+                <div>
+                  Predicted in 1 h:{' '}
+                  <strong>{predictedLevel60.toFixed(1)} m</strong>
+                </div>
                 <div className={`badge ${flushedToday ? 'green' : 'amber'}`}>
                   <span className="badge-dot" />
                   <span>
@@ -133,18 +146,36 @@ export default function Dashboard() {
               <div className="flow-block">
                 <label>Inflow F1</label>
                 <div className="flow-primary">
-                  {inflow15.toLocaleString()} m³ / 15 min
+                  {inflowM3h.toLocaleString(undefined, {
+                    maximumFractionDigits: 0
+                  })}{' '}
+                  m³ / h
                 </div>
-                <div style={{ fontSize: 12, color: '#6b7280', marginTop: 2 }}>
+                <div
+                  style={{
+                    fontSize: 12,
+                    color: '#6b7280',
+                    marginTop: 2
+                  }}
+                >
                   Forecast stable next 2 h
                 </div>
               </div>
               <div className="flow-block">
                 <label>Outflow F2</label>
                 <div className="flow-primary">
-                  {totalFlow.toLocaleString(undefined, { maximumFractionDigits: 0 })} m³ / h
+                  {totalFlow.toLocaleString(undefined, {
+                    maximumFractionDigits: 0
+                  })}{' '}
+                  m³ / h
                 </div>
-                <div style={{ fontSize: 12, color: '#6b7280', marginTop: 2 }}>
+                <div
+                  style={{
+                    fontSize: 12,
+                    color: '#6b7280',
+                    marginTop: 2
+                  }}
+                >
                   Commanded: 12 000 m³ / h
                 </div>
               </div>
@@ -152,86 +183,48 @@ export default function Dashboard() {
           </div>
 
           {/* Cost card */}
-          <div className="card">
+          <div className="card" style={{ marginBottom: 14 }}>
             <div className="card-header">
               <div className="card-title">Energy & cost</div>
             </div>
             <div className="cost-metrics">
               <div>
-                <span className="label">Instant power</span><br />
+                <span className="label">Instant power</span>
+                <br />
                 <span className="value">{totalPower.toFixed(0)} kW</span>
               </div>
               <div>
-                <span className="label">Energy today</span><br />
+                <span className="label">Energy today</span>
+                <br />
                 <span className="value">{energyThisDayMWh.toFixed(1)} MWh</span>
               </div>
               <div>
-                <span className="label">Cost today</span><br />
+                <span className="label">Cost today</span>
+                <br />
                 <span className="value">{costThisDay.toLocaleString()} €</span>
               </div>
             </div>
             <div className="cost-bar">
-              <div className="cost-bar-big" style={{ width: `${bigShare}%` }} />
-              <div className="cost-bar-small" style={{ width: `${smallShare}%` }} />
+              <div
+                className="cost-bar-big"
+                style={{ width: `${bigShare}%` }}
+              />
+              <div
+                className="cost-bar-small"
+                style={{ width: `${smallShare}%` }}
+              />
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4, fontSize: 11, color: '#6b7280' }}>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                marginTop: 4,
+                fontSize: 11,
+                color: '#6b7280'
+              }}
+            >
               <span>Big pumps {bigShare.toFixed(0)}%</span>
               <span>Small pumps {smallShare.toFixed(0)}%</span>
-            </div>
-          </div>
-        </section>
-
-        {/* Right column */}
-        <section>
-          <div className="card" style={{ marginBottom: 14 }}>
-            <div className="pump-section">
-              <div className="pump-section-header">
-                <div>
-                  <span className="pump-section-title">Big pumps</span>
-                  <span className="pump-section-sub"> · 6 installed</span>
-                </div>
-                <span className="pump-section-sub">{bigOn} / 5 max on</span>
-              </div>
-              <div className="pump-list">
-                {pumps.filter(p => p.kind === 'big').map(p => (
-                  <PumpTile key={p.id} pump={p} mode={mode} />
-                ))}
-              </div>
-            </div>
-
-            <div className="pump-section">
-              <div className="pump-section-header">
-                <div>
-                  <span className="pump-section-title">Small pumps</span>
-                  <span className="pump-section-sub"> · 2 installed</span>
-                </div>
-                <span className="pump-section-sub">{smallOn} on</span>
-              </div>
-              <div className="pump-list">
-                {pumps.filter(p => p.kind === 'small').map(p => (
-                  <PumpTile key={p.id} pump={p} mode={mode} />
-                ))}
-              </div>
-            </div>
-
-            {/* Plan strip */}
-            <div className="card-subtitle" style={{ marginTop: 8, marginBottom: 4 }}>
-              Next 1 h plan
-            </div>
-            <div className="plan-strip">
-              {mockPlan.map(slot => (
-                <div
-                  key={slot.offset}
-                  className={`plan-chip ${slot.current ? 'current' : ''}`}
-                >
-                  <label>{slot.label}</label>
-                  <div className="plan-main">{slot.flowM3h.toLocaleString()} m³/h</div>
-                  <div>
-                    {slot.bigOn} big · {slot.smallOn} small
-                  </div>
-                  <div>~ {slot.cost} €</div>
-                </div>
-              ))}
             </div>
           </div>
 
@@ -248,6 +241,70 @@ export default function Dashboard() {
               <li>Pumps chosen are those with lowest runtime to balance wear.</li>
               <li>No pump switched earlier than 2 h since last toggle.</li>
             </ul>
+          </div>
+        </section>
+
+        {/* Right column */}
+        <section>
+          <div className="card">
+            <div className="pump-section">
+              <div className="pump-section-header">
+                <div>
+                  <span className="pump-section-title">Big pumps</span>
+                  <span className="pump-section-sub"> · 6 installed</span>
+                </div>
+                <span className="pump-section-sub">{bigOn} on</span>
+              </div>
+              <div className="pump-list">
+                {pumps
+                  .filter(p => p.kind === 'big')
+                  .map(p => (
+                    <PumpTile key={p.id} pump={p} mode={mode} />
+                  ))}
+              </div>
+            </div>
+
+            <div className="pump-section">
+              <div className="pump-section-header">
+                <div>
+                  <span className="pump-section-title">Small pumps</span>
+                  <span className="pump-section-sub"> · 2 installed</span>
+                </div>
+                <span className="pump-section-sub">{smallOn} on</span>
+              </div>
+              <div className="pump-list">
+                {pumps
+                  .filter(p => p.kind === 'small')
+                  .map(p => (
+                    <PumpTile key={p.id} pump={p} mode={mode} />
+                  ))}
+              </div>
+            </div>
+
+            {/* Plan strip */}
+            <div
+              className="card-subtitle"
+              style={{ marginTop: 8, marginBottom: 4 }}
+            >
+              Next 1 h plan
+            </div>
+            <div className="plan-strip">
+              {mockPlan.map(slot => (
+                <div
+                  key={slot.offset}
+                  className={`plan-chip ${slot.current ? 'current' : ''}`}
+                >
+                  <label>{slot.label}</label>
+                  <div className="plan-main">
+                    {slot.flowM3h.toLocaleString()} m³/h
+                  </div>
+                  <div>
+                    {slot.bigOn} big · {slot.smallOn} small
+                  </div>
+                  <div>~ {slot.cost} €</div>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
       </main>
@@ -312,7 +369,8 @@ function PumpTile({ pump, mode }) {
           {pump.isOn ? pump.freqHz.toFixed(1) : '0.0'} Hz
         </div>
         <div className="flow">
-          {pump.isOn ? pump.flowM3h.toFixed(0) : 0} m³/h · {pump.powerKw.toFixed(0)} kW
+          {pump.isOn ? pump.flowM3h.toFixed(0) : 0} m³/h ·{' '}
+          {pump.powerKw.toFixed(0)} kW
         </div>
         {mode === 'auto' ? (
           <span className="tag">AI controlled</span>
