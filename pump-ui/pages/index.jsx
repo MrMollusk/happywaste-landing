@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
 
 const mockPumps = [
-  { id: 'S1', kind: 'small', isOn: true, freqHz: 49.0, flowM3h: 2800, powerKw: 180, runtimeHours: 120, stepsSinceSwitch: 10 },
-  { id: 'S2', kind: 'small', isOn: false, freqHz: 0.0, flowM3h: 0, powerKw: 0, runtimeHours: 118, stepsSinceSwitch: 20 },
-  { id: 'B1', kind: 'big', isOn: true, freqHz: 49.1, flowM3h: 3200, powerKw: 360, runtimeHours: 230, stepsSinceSwitch: 5 },
-  { id: 'B2', kind: 'big', isOn: true, freqHz: 49.1, flowM3h: 3200, powerKw: 360, runtimeHours: 220, stepsSinceSwitch: 6 },
-  { id: 'B3', kind: 'big', isOn: true, freqHz: 49.1, flowM3h: 3200, powerKw: 360, runtimeHours: 215, stepsSinceSwitch: 6 },
-  { id: 'B4', kind: 'big', isOn: false, freqHz: 0.0, flowM3h: 0, powerKw: 0, runtimeHours: 210, stepsSinceSwitch: 18 },
-  { id: 'B5', kind: 'big', isOn: false, freqHz: 0.0, flowM3h: 0, powerKw: 0, runtimeHours: 205, stepsSinceSwitch: 18 },
-  { id: 'B6', kind: 'big', isOn: false, freqHz: 0.0, flowM3h: 0, powerKw: 0, runtimeHours: 205, stepsSinceSwitch: 18 }
+  { id: '1.1', kind: 'small', isOn: true, freqHz: 49.0, flowM3h: 2800, powerKw: 180, runtimeHours: 120, stepsSinceSwitch: 10 },
+  { id: '2.1', kind: 'small', isOn: false, freqHz: 0.0, flowM3h: 0, powerKw: 0, runtimeHours: 118, stepsSinceSwitch: 20 },
+  { id: '1.2', kind: 'big', isOn: true, freqHz: 49.1, flowM3h: 3200, powerKw: 360, runtimeHours: 230, stepsSinceSwitch: 5 },
+  { id: '2.2', kind: 'big', isOn: true, freqHz: 49.1, flowM3h: 3200, powerKw: 360, runtimeHours: 220, stepsSinceSwitch: 6 },
+  { id: '1.3', kind: 'big', isOn: true, freqHz: 49.1, flowM3h: 3200, powerKw: 360, runtimeHours: 215, stepsSinceSwitch: 6 },
+  { id: '2.3', kind: 'big', isOn: false, freqHz: 0.0, flowM3h: 0, powerKw: 0, runtimeHours: 210, stepsSinceSwitch: 18 },
+  { id: '1.5', kind: 'big', isOn: false, freqHz: 0.0, flowM3h: 0, powerKw: 0, runtimeHours: 205, stepsSinceSwitch: 18 },
+  { id: '2.4', kind: 'big', isOn: false, freqHz: 0.0, flowM3h: 0, powerKw: 0, runtimeHours: 205, stepsSinceSwitch: 18 }
 ];
 
 const mockPlan = [
