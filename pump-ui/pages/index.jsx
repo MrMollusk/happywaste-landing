@@ -29,8 +29,8 @@ export default function Dashboard() {
   // mock tunnel state
   const level = 3.2;
   const volume = 10955;
-  const inflow15 = 1450; // m³ / 15 min (raw)
-  const inflowM3h = inflow15 * 4; // converted to m³ / h
+  const inflow15 = 1450; // m³ / 15 min
+  const inflowM3h = inflow15 * 4; // m³ / h
   const predictedLevel15 = 3.0;
   const predictedLevel60 = 2.7;
   const flushedToday = true;
@@ -228,8 +228,32 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Why panel */}
+          {/* Next 1 h plan */}
           <div className="card">
+            <div className="card-header">
+              <div className="card-title">Next 1 h plan</div>
+            </div>
+            <div className="plan-strip">
+              {mockPlan.map(slot => (
+                <div
+                  key={slot.offset}
+                  className={`plan-chip ${slot.current ? 'current' : ''}`}
+                >
+                  <label>{slot.label}</label>
+                  <div className="plan-main">
+                    {slot.flowM3h.toLocaleString()} m³/h
+                  </div>
+                  <div>
+                    {slot.bigOn} big · {slot.smallOn} small
+                  </div>
+                  <div>~ {slot.cost} €</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Why panel */}
+          <div className="card" style={{ marginTop: 14 }}>
             <div className="card-header">
               <div className="card-title">This 15-min decision</div>
             </div>
@@ -247,62 +271,15 @@ export default function Dashboard() {
         {/* Right column */}
         <section>
           <div className="card">
-            <div className="pump-section">
-              <div className="pump-section-header">
-                <div>
-                  <span className="pump-section-title">Big pumps</span>
-                  <span className="pump-section-sub"> · 6 installed</span>
-                </div>
-                <span className="pump-section-sub">{bigOn} on</span>
-              </div>
-              <div className="pump-list">
-                {pumps
-                  .filter(p => p.kind === 'big')
-                  .map(p => (
-                    <PumpTile key={p.id} pump={p} mode={mode} />
-                  ))}
+            <div className="card-header">
+              <div className="card-title">Pumps</div>
+              <div className="card-subtitle">
+                Big: 6 installed ({bigOn} on) · Small: 2 installed ({smallOn} on)
               </div>
             </div>
-
-            <div className="pump-section">
-              <div className="pump-section-header">
-                <div>
-                  <span className="pump-section-title">Small pumps</span>
-                  <span className="pump-section-sub"> · 2 installed</span>
-                </div>
-                <span className="pump-section-sub">{smallOn} on</span>
-              </div>
-              <div className="pump-list">
-                {pumps
-                  .filter(p => p.kind === 'small')
-                  .map(p => (
-                    <PumpTile key={p.id} pump={p} mode={mode} />
-                  ))}
-              </div>
-            </div>
-
-            {/* Plan strip */}
-            <div
-              className="card-subtitle"
-              style={{ marginTop: 8, marginBottom: 4 }}
-            >
-              Next 1 h plan
-            </div>
-            <div className="plan-strip">
-              {mockPlan.map(slot => (
-                <div
-                  key={slot.offset}
-                  className={`plan-chip ${slot.current ? 'current' : ''}`}
-                >
-                  <label>{slot.label}</label>
-                  <div className="plan-main">
-                    {slot.flowM3h.toLocaleString()} m³/h
-                  </div>
-                  <div>
-                    {slot.bigOn} big · {slot.smallOn} small
-                  </div>
-                  <div>~ {slot.cost} €</div>
-                </div>
+            <div className="pump-grid">
+              {pumps.map(p => (
+                <PumpTile key={p.id} pump={p} mode={mode} />
               ))}
             </div>
           </div>
