@@ -380,6 +380,14 @@ body {
   color: #6b7280;
 }
 
+/* Pump grid */
+
+.pump-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
 /* Plan strip */
 
 .plan-strip {
