@@ -7,7 +7,7 @@ const mockPumps = [
   { id: '2.2', kind: 'big', isOn: true, freqHz: 49.1, flowM3h: 3200, powerKw: 360, runtimeHours: 220, stepsSinceSwitch: 6 },
   { id: '1.3', kind: 'big', isOn: true, freqHz: 49.1, flowM3h: 3200, powerKw: 360, runtimeHours: 215, stepsSinceSwitch: 6 },
   { id: '2.3', kind: 'big', isOn: false, freqHz: 0.0, flowM3h: 0, powerKw: 0, runtimeHours: 210, stepsSinceSwitch: 18 },
-  { id: '1.5', kind: 'big', isOn: false, freqHz: 0.0, flowM3h: 0, powerKw: 0, runtimeHours: 205, stepsSinceSwitch: 18 },
+  { id: '1.4', kind: 'big', isOn: false, freqHz: 0.0, flowM3h: 0, powerKw: 0, runtimeHours: 205, stepsSinceSwitch: 18 },
   { id: '2.4', kind: 'big', isOn: false, freqHz: 0.0, flowM3h: 0, powerKw: 0, runtimeHours: 205, stepsSinceSwitch: 18 }
 ];
 
