@@ -1,14 +1,118 @@
 import { useState, useEffect } from 'react';
 
 const mockPumps = [
-  { id: '1.1', kind: 'small', isOn: true, freqHz: 49.0, flowM3h: 2800, powerKw: 180, runtimeHours: 120, stepsSinceSwitch: 10 },
-  { id: '2.1', kind: 'small', isOn: false, freqHz: 0.0, flowM3h: 0, powerKw: 0, runtimeHours: 118, stepsSinceSwitch: 20 },
-  { id: '1.2', kind: 'big', isOn: true, freqHz: 49.1, flowM3h: 3200, powerKw: 360, runtimeHours: 230, stepsSinceSwitch: 5 },
-  { id: '2.2', kind: 'big', isOn: true, freqHz: 49.1, flowM3h: 3200, powerKw: 360, runtimeHours: 220, stepsSinceSwitch: 6 },
-  { id: '1.3', kind: 'big', isOn: true, freqHz: 49.1, flowM3h: 3200, powerKw: 360, runtimeHours: 215, stepsSinceSwitch: 6 },
-  { id: '2.3', kind: 'big', isOn: false, freqHz: 0.0, flowM3h: 0, powerKw: 0, runtimeHours: 210, stepsSinceSwitch: 18 },
-  { id: '1.4', kind: 'big', isOn: false, freqHz: 0.0, flowM3h: 0, powerKw: 0, runtimeHours: 205, stepsSinceSwitch: 18 },
-  { id: '2.4', kind: 'big', isOn: false, freqHz: 0.0, flowM3h: 0, powerKw: 0, runtimeHours: 205, stepsSinceSwitch: 18 }
+  {
+    id: '1.1',
+    kind: 'small',
+    isOn: true,
+    freqHz: 49.0,
+    flowM3h: 2800,
+    powerKw: 180,
+    runtimeHours: 120,
+    stepsSinceSwitch: 10,
+    startsToday: 18,
+    totalStarts: 3540,
+    hoursToService: 120,
+    healthStatus: 'ok'
+  },
+  {
+    id: '2.1',
+    kind: 'small',
+    isOn: false,
+    freqHz: 0.0,
+    flowM3h: 0,
+    powerKw: 0,
+    runtimeHours: 118,
+    stepsSinceSwitch: 20,
+    startsToday: 12,
+    totalStarts: 3400,
+    hoursToService: 40,
+    healthStatus: 'due'
+  },
+  {
+    id: '1.2',
+    kind: 'big',
+    isOn: true,
+    freqHz: 49.1,
+    flowM3h: 3200,
+    powerKw: 360,
+    runtimeHours: 230,
+    stepsSinceSwitch: 5,
+    startsToday: 10,
+    totalStarts: 4100,
+    hoursToService: 200,
+    healthStatus: 'ok'
+  },
+  {
+    id: '2.2',
+    kind: 'big',
+    isOn: true,
+    freqHz: 49.1,
+    flowM3h: 3200,
+    powerKw: 360,
+    runtimeHours: 220,
+    stepsSinceSwitch: 6,
+    startsToday: 9,
+    totalStarts: 4050,
+    hoursToService: 80,
+    healthStatus: 'ok'
+  },
+  {
+    id: '1.3',
+    kind: 'big',
+    isOn: true,
+    freqHz: 49.1,
+    flowM3h: 3200,
+    powerKw: 360,
+    runtimeHours: 215,
+    stepsSinceSwitch: 6,
+    startsToday: 15,
+    totalStarts: 3980,
+    hoursToService: 24,
+    healthStatus: 'due'
+  },
+  {
+    id: '2.3',
+    kind: 'big',
+    isOn: false,
+    freqHz: 0.0,
+    flowM3h: 0,
+    powerKw: 0,
+    runtimeHours: 210,
+    stepsSinceSwitch: 18,
+    startsToday: 0,
+    totalStarts: 3800,
+    hoursToService: 0,
+    healthStatus: 'out'
+  },
+  {
+    id: '1.5',
+    kind: 'big',
+    isOn: false,
+    freqHz: 0.0,
+    flowM3h: 0,
+    powerKw: 0,
+    runtimeHours: 205,
+    stepsSinceSwitch: 18,
+    startsToday: 3,
+    totalStarts: 3650,
+    hoursToService: 60,
+    healthStatus: 'ok'
+  },
+  {
+    id: '2.4',
+    kind: 'big',
+    isOn: false,
+    freqHz: 0.0,
+    flowM3h: 0,
+    powerKw: 0,
+    runtimeHours: 205,
+    stepsSinceSwitch: 18,
+    startsToday: 1,
+    totalStarts: 3600,
+    hoursToService: 10,
+    healthStatus: 'due'
+  }
 ];
 
 const mockPlan = [
@@ -18,10 +122,91 @@ const mockPlan = [
   { label: '+45 min', offset: 3, flowM3h: 9000, bigOn: 2, smallOn: 0, cost: 160 }
 ];
 
+const mockAlarms = [
+  {
+    id: 'a1',
+    assetId: 'Pump 1.3',
+    severity: 'Critical',
+    message: 'Motor over-temperature',
+    raisedAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
+    clearedAt: null,
+    acknowledgedBy: null,
+    acknowledgedAt: null
+  },
+  {
+    id: 'a2',
+    assetId: 'Level sensor L1',
+    severity: 'Major',
+    message: 'Signal dropout (intermittent)',
+    raisedAt: new Date(Date.now() - 12 * 60 * 1000).toISOString(),
+    clearedAt: null,
+    acknowledgedBy: 'J. Smith',
+    acknowledgedAt: new Date(Date.now() - 10 * 60 * 1000).toISOString()
+  },
+  {
+    id: 'a3',
+    assetId: 'Pump 2.3',
+    severity: 'Minor',
+    message: 'Service due in 24 h',
+    raisedAt: new Date(Date.now() - 25 * 60 * 1000).toISOString(),
+    clearedAt: null,
+    acknowledgedBy: null,
+    acknowledgedAt: null
+  }
+];
+
+const mockEvents = [
+  { id: 'e1', time: '16:21', text: 'Pump 1.3 ON (AI)' },
+  { id: 'e2', time: '16:18', text: 'Level reached 3.0 m (flush start)' },
+  { id: 'e3', time: '16:10', text: 'Pump 2.3 TRIP cleared' },
+  { id: 'e4', time: '15:55', text: 'Tariff band changed: High → Normal' }
+];
+
+function formatAge(seconds) {
+  if (seconds < 1) return '<1 s ago';
+  if (seconds < 60) return `${seconds.toFixed(1)} s ago`;
+  const minutes = Math.floor(seconds / 60);
+  const rem = Math.floor(seconds % 60);
+  if (minutes < 60) return `${minutes} min${rem ? ` ${rem} s` : ''} ago`;
+  const hours = Math.floor(minutes / 60);
+  return `${hours} h ${minutes % 60} min ago`;
+}
+
+function formatSince(nowMs, iso) {
+  const diffSec = (nowMs - new Date(iso).getTime()) / 1000;
+  if (diffSec < 60) return `${Math.floor(diffSec)} s`;
+  const m = Math.floor(diffSec / 60);
+  if (m < 60) return `${m} min`;
+  const h = Math.floor(m / 60);
+  return `${h} h`;
+}
+
 export default function Dashboard() {
-  const [mode, setMode] = useState('auto'); // 'auto' | 'manual'
+  const [mode, setMode] = useState('auto');
+  const [activeTab, setActiveTab] = useState('overview');
   const [pumps, setPumps] = useState(mockPumps);
   const [price, setPrice] = useState(0.291);
+  const [alarms, setAlarms] = useState(mockAlarms);
+  const [now, setNow] = useState(Date.now());
+  const [lastTelemetryTs] = useState(Date.now() - 800); // mock: 0.8s ago at mount
+  const [highlightedAlarmId, setHighlightedAlarmId] = useState(
+    mockAlarms[0]?.id ?? null
+  );
+  const [showDecisionDetails, setShowDecisionDetails] = useState(false);
+  const [selectedTrend, setSelectedTrend] = useState(null);
+  const [selectedLogFilter, setSelectedLogFilter] = useState(null);
+  const [selectedPumpId, setSelectedPumpId] = useState(null);
+
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  useEffect(() => {
+    if (!highlightedAlarmId) return;
+    const id = setTimeout(() => setHighlightedAlarmId(null), 4000);
+    return () => clearTimeout(id);
+  }, [highlightedAlarmId]);
 
   const totalFlow = pumps.reduce((s, p) => s + (p.isOn ? p.flowM3h : 0), 0);
   const totalPower = pumps.reduce((s, p) => s + (p.isOn ? p.powerKw : 0), 0);
@@ -57,58 +242,321 @@ export default function Dashboard() {
     minute: '2-digit'
   });
 
+  // Data freshness
+  const ageSeconds = (now - lastTelemetryTs) / 1000;
+  let freshnessStatus = 'live'; // 'live' | 'lagging' | 'stale'
+  if (ageSeconds >= 10 && ageSeconds <= 60) freshnessStatus = 'lagging';
+  if (ageSeconds > 60) freshnessStatus = 'stale';
+
+  const lastUpdate = new Date(lastTelemetryTs);
+  const lastUpdateTimeStr = lastUpdate.toLocaleTimeString('fi-FI', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  });
+  const ageLabel = formatAge(ageSeconds);
+  const ageShort = ageLabel.replace(' ago', '');
+
+  // Alarms
+  const activeAlarms = alarms.filter(a => !a.clearedAt);
+  const sortedActiveAlarms = [...activeAlarms].sort(
+    (a, b) => new Date(b.raisedAt) - new Date(a.raisedAt)
+  );
+
+  const criticalUnacked = activeAlarms.filter(
+    a => !a.acknowledgedBy && a.severity === 'Critical'
+  );
+  const majorUnacked = activeAlarms.filter(
+    a => !a.acknowledgedBy && a.severity === 'Major'
+  );
+
+  const criticalCount = criticalUnacked.length;
+  const majorCount = majorUnacked.length;
+
+  const hasStale = freshnessStatus === 'stale';
+  const hasLagging = freshnessStatus === 'lagging';
+
+  const showStatusBanner =
+    criticalCount > 0 || majorCount > 0 || hasStale || hasLagging;
+
+  let bannerVariant = '';
+  if (criticalCount > 0 || hasStale) bannerVariant = 'critical';
+  else if (majorCount > 0 || hasLagging) bannerVariant = 'warning';
+
+  const severityParts = [];
+  if (criticalCount > 0) severityParts.push(`${criticalCount} critical`);
+  if (majorCount > 0) severityParts.push(`${majorCount} major`);
+
+  const stateParts = [];
+  if (hasStale) stateParts.push(`DATA STALE (${ageShort})`);
+  else if (hasLagging) stateParts.push(`DATA LAGGING (${ageShort})`);
+
+  const bannerText = [severityParts.join(', '), stateParts.join(' · ')]
+    .filter(Boolean)
+    .join(' · ');
+
+  const handleAcknowledge = id => {
+    setAlarms(prev =>
+      prev.map(a =>
+        a.id === id && !a.acknowledgedBy
+          ? {
+              ...a,
+              acknowledgedBy: 'J. Smith',
+              acknowledgedAt: new Date().toISOString()
+            }
+          : a
+      )
+    );
+  };
+
+  const stationStateLabel =
+    freshnessStatus === 'live' ? 'Normal' : 'Degraded';
+  const stationStateDetail =
+    freshnessStatus === 'live'
+      ? 'data live'
+      : freshnessStatus === 'lagging'
+      ? `data lagging ${ageShort}`
+      : `data stale ${ageShort}`;
+
+  const telemetryLabel =
+    freshnessStatus === 'live'
+      ? 'Live'
+      : freshnessStatus === 'lagging'
+      ? 'Lagging'
+      : 'Stale';
+
+  const scadaLabel = 'OK';
+
+  const openTrends = metric => {
+    setSelectedTrend(metric);
+    setActiveTab('trends');
+  };
+
+  const openLogsForContext = ctx => {
+    setSelectedLogFilter(ctx);
+    setActiveTab('logs');
+  };
+
+  const openPumpDetails = pumpId => {
+    setSelectedPumpId(pumpId);
+    setActiveTab('maintenance');
+  };
+
+  const severityCodeMap = {
+    Critical: 'C',
+    Major: 'M',
+    Minor: 'm',
+    Info: 'i'
+  };
+
+  // Non-overview tabs
+  if (activeTab !== 'overview') {
+    return (
+      <div className="app-root">
+        <header className="topbar">
+          <div>
+            <div className="topbar-title">Blominmäki · Pumping Station</div>
+            <div className="topbar-sub-row">
+              <span className="topbar-sub">{nowStr}</span>
+              <span className="last-update">
+                Last update: {lastUpdateTimeStr} ({ageLabel})
+              </span>
+            </div>
+            <div className="station-tabs">
+              {['overview', 'trends', 'maintenance', 'config', 'logs'].map(
+                tab => (
+                  <button
+                    key={tab}
+                    className={`station-tab ${
+                      activeTab === tab ? 'active' : ''
+                    }`}
+                    onClick={() => setActiveTab(tab)}
+                  >
+                    {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                  </button>
+                )
+              )}
+            </div>
+          </div>
+
+          <div className="topbar-right">
+            <div className="operator-info">
+              Operator: J. Smith · Role: Operator
+            </div>
+            <div>
+              <div className="mode-toggle">
+                <button
+                  className={`mode-pill ${mode === 'auto' ? 'active' : ''}`}
+                  onClick={() => setMode('auto')}
+                >
+                  Auto
+                </button>
+                <button
+                  className={`mode-pill ${mode === 'manual' ? 'active' : ''}`}
+                  onClick={() => setMode('manual')}
+                >
+                  Manual
+                </button>
+              </div>
+              <div className="mode-note">
+                Last mode change: Auto → Manual by J. Smith at 15:40
+              </div>
+            </div>
+            <div className="price-chip">
+              <span className="value">{price.toFixed(3)} €/kWh</span>
+              <span>High tariff</span>
+            </div>
+          </div>
+        </header>
+
+        {showStatusBanner && (
+          <div className={`alarm-banner ${bannerVariant || 'critical'}`}>
+            <span>⚠ {bannerText || 'DATA STATE'}</span>
+            <a href="#alarms-panel">View alarms</a>
+          </div>
+        )}
+
+        <div className="secondary-tab">
+          <div className="card">
+            <div className="card-header">
+              <div className="card-title">
+                {activeTab === 'trends' && 'Trends'}
+                {activeTab === 'maintenance' && 'Maintenance'}
+                {activeTab === 'config' && 'Config'}
+                {activeTab === 'logs' && 'Logs'}
+              </div>
+              <div className="card-subtitle">
+                Blominmäki ·{' '}
+                {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
+              </div>
+            </div>
+            <div style={{ fontSize: 13, color: '#374151' }}>
+              {activeTab === 'trends' && (
+                <>
+                  Trends view (placeholder).{' '}
+                  {selectedTrend &&
+                    `Focused metric: ${selectedTrend.toUpperCase()}.`}
+                </>
+              )}
+              {activeTab === 'maintenance' && (
+                <>
+                  Maintenance view (placeholder).{' '}
+                  {selectedPumpId && `Focused pump: ${selectedPumpId}.`}
+                </>
+              )}
+              {activeTab === 'config' && (
+                <>Configuration view (placeholder).</>
+              )}
+              {activeTab === 'logs' && (
+                <>
+                  Logs view (placeholder).{' '}
+                  {selectedLogFilter &&
+                    `Context: ${selectedLogFilter.type} ${selectedLogFilter.id}.`}
+                </>
+              )}
+              {!['trends', 'maintenance', 'config', 'logs'].includes(
+                activeTab
+              ) && <>Non-overview tab.</>}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Overview
   return (
     <div className="app-root">
       {/* Top bar */}
       <header className="topbar">
         <div>
           <div className="topbar-title">Blominmäki · Pumping Station</div>
-          <div className="topbar-sub">{nowStr}</div>
+          <div className="topbar-sub-row">
+            <span className="topbar-sub">{nowStr}</span>
+            <span className="last-update">
+              Last update: {lastUpdateTimeStr} ({ageLabel})
+            </span>
+          </div>
+          <div className="station-tabs">
+            {['overview', 'trends', 'maintenance', 'config', 'logs'].map(
+              tab => (
+                <button
+                  key={tab}
+                  className={`station-tab ${
+                    activeTab === tab ? 'active' : ''
+                  }`}
+                  onClick={() => setActiveTab(tab)}
+                >
+                  {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                </button>
+              )
+            )}
+          </div>
         </div>
 
-        <div className="mode-toggle">
-          <button
-            className={`mode-pill ${mode === 'auto' ? 'active' : ''}`}
-            onClick={() => setMode('auto')}
-          >
-            Auto
-          </button>
-          <button
-            className={`mode-pill ${mode === 'manual' ? 'active' : ''}`}
-            onClick={() => setMode('manual')}
-          >
-            Manual
-          </button>
-        </div>
-
-        <div className="price-chip">
-          <span className="value">{price.toFixed(3)} €/kWh</span>
-          <span>High tariff</span>
+        <div className="topbar-right">
+          <div className="operator-info">
+            Operator: J. Smith · Role: Operator
+          </div>
+          <div>
+            <div className="mode-toggle">
+              <button
+                className={`mode-pill ${mode === 'auto' ? 'active' : ''}`}
+                onClick={() => setMode('auto')}
+              >
+                Auto
+              </button>
+              <button
+                className={`mode-pill ${mode === 'manual' ? 'active' : ''}`}
+                onClick={() => setMode('manual')}
+              >
+                Manual
+              </button>
+            </div>
+            <div className="mode-note">
+              Last mode change: Auto → Manual by J. Smith at 15:40
+            </div>
+          </div>
+          <div className="price-chip">
+            <span className="value">{price.toFixed(3)} €/kWh</span>
+            <span>High tariff</span>
+          </div>
         </div>
       </header>
 
-      {/* Constraint bar */}
-      <div className="constraint-bar">
-        <span className="constraint-chip ok">Level safe · 0–8 m</span>
-        <span className="constraint-chip ok">Wear balanced</span>
-        <span className="constraint-chip ok">Switching within limits</span>
-        <span className="constraint-chip ok">
-          F2 {totalFlow.toLocaleString(undefined, { maximumFractionDigits: 0 })} m³/h · limit 16 000
-        </span>
-        <span className={`constraint-chip ${flushedToday ? 'ok' : 'warn'}`}>
-          Flush {flushedToday ? 'done today' : 'pending'}
-        </span>
-      </div>
+      {showStatusBanner && (
+        <div className={`alarm-banner ${bannerVariant || 'critical'}`}>
+          <span>⚠ {bannerText || 'DATA STATE'}</span>
+          <a href="#alarms-panel">View alarms</a>
+        </div>
+      )}
 
       {/* Main grid */}
       <main className="main-grid">
         {/* Left column */}
         <section>
           {/* Tunnel card */}
-          <div className="card" style={{ marginBottom: 14 }}>
+          <div
+            className={`card card-clickable data-card ${
+              freshnessStatus !== 'live' ? 'data-card-stale' : ''
+            }`}
+            style={{ marginBottom: 14 }}
+            onClick={() => openTrends('level')}
+          >
             <div className="card-header">
-              <div className="card-title">Tunnel level</div>
-              <div className="card-subtitle">Blominmäki balancing tunnel</div>
+              <div>
+                <div className="card-title">Tunnel level</div>
+                <div className="card-subtitle">
+                  Blominmäki balancing tunnel
+                </div>
+              </div>
+              {freshnessStatus !== 'live' && (
+                <span
+                  className={`data-freshness-chip ${freshnessStatus}`}
+                >
+                  Data {freshnessStatus}
+                </span>
+              )}
             </div>
             <div className="tunnel-gauge">
               <div className="tunnel-value">
@@ -135,12 +583,37 @@ export default function Dashboard() {
                 </div>
               </div>
             </div>
+            <div className="limit-bar">
+              <div className="limit-segment safe" />
+              <div className="limit-segment warn" />
+              <div className="limit-segment alarm" />
+              <div
+                className="limit-marker"
+                style={{ left: `${Math.min(level / 10, 1) * 100}%` }}
+              />
+            </div>
+            <div className="limit-caption">
+              Safe: 0–8 m · Warning: 8–9 m · Alarm: &gt;9 m
+            </div>
           </div>
 
           {/* Flow & balance */}
-          <div className="card" style={{ marginBottom: 14 }}>
+          <div
+            className={`card card-clickable data-card ${
+              freshnessStatus !== 'live' ? 'data-card-stale' : ''
+            }`}
+            style={{ marginBottom: 14 }}
+            onClick={() => openTrends('flow')}
+          >
             <div className="card-header">
               <div className="card-title">Flow balance</div>
+              {freshnessStatus !== 'live' && (
+                <span
+                  className={`data-freshness-chip ${freshnessStatus}`}
+                >
+                  Data {freshnessStatus}
+                </span>
+              )}
             </div>
             <div className="flow-grid">
               <div className="flow-block">
@@ -154,11 +627,25 @@ export default function Dashboard() {
                 <div
                   style={{
                     fontSize: 12,
-                    color: '#6b7280',
+                    color: '#4b5563',
                     marginTop: 2
                   }}
                 >
                   Forecast stable next 2 h
+                </div>
+                <div className="limit-bar">
+                  <div className="limit-segment safe" />
+                  <div className="limit-segment warn" />
+                  <div className="limit-segment alarm" />
+                  <div
+                    className="limit-marker"
+                    style={{
+                      left: `${Math.min(inflowM3h / 20000, 1) * 100}%`
+                    }}
+                  />
+                </div>
+                <div className="limit-caption">
+                  Safe: 0–15 000 m³/h · Warning: 15–16 000 · Alarm: &gt;16 000
                 </div>
               </div>
               <div className="flow-block">
@@ -172,20 +659,47 @@ export default function Dashboard() {
                 <div
                   style={{
                     fontSize: 12,
-                    color: '#6b7280',
+                    color: '#4b5563',
                     marginTop: 2
                   }}
                 >
                   Commanded: 12 000 m³ / h
+                </div>
+                <div className="limit-bar">
+                  <div className="limit-segment safe" />
+                  <div className="limit-segment warn" />
+                  <div className="limit-segment alarm" />
+                  <div
+                    className="limit-marker"
+                    style={{
+                      left: `${Math.min(totalFlow / 20000, 1) * 100}%`
+                    }}
+                  />
+                </div>
+                <div className="limit-caption">
+                  Safe: 0–14 000 m³/h · Warning: 14–16 000 · Alarm: &gt;16 000
                 </div>
               </div>
             </div>
           </div>
 
           {/* Cost card */}
-          <div className="card" style={{ marginBottom: 14 }}>
+          <div
+            className={`card card-clickable data-card ${
+              freshnessStatus !== 'live' ? 'data-card-stale' : ''
+            }`}
+            style={{ marginBottom: 14 }}
+            onClick={() => openTrends('energy')}
+          >
             <div className="card-header">
               <div className="card-title">Energy & cost</div>
+              {freshnessStatus !== 'live' && (
+                <span
+                  className={`data-freshness-chip ${freshnessStatus}`}
+                >
+                  Data {freshnessStatus}
+                </span>
+              )}
             </div>
             <div className="cost-metrics">
               <div>
@@ -220,7 +734,7 @@ export default function Dashboard() {
                 justifyContent: 'space-between',
                 marginTop: 4,
                 fontSize: 11,
-                color: '#6b7280'
+                color: '#4b5563'
               }}
             >
               <span>Big pumps {bigShare.toFixed(0)}%</span>
@@ -228,7 +742,7 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Next 1 h plan */}
+          {/* Plan + rationale */}
           <div className="card">
             <div className="card-header">
               <div className="card-title">Next 1 h plan</div>
@@ -250,25 +764,44 @@ export default function Dashboard() {
                 </div>
               ))}
             </div>
-          </div>
-
-          {/* Why panel */}
-          <div className="card" style={{ marginTop: 14 }}>
-            <div className="card-header">
-              <div className="card-title">This 15-min decision</div>
+            <div className="why-compact">
+              <div>Commanded flow: 12 000 m³/h</div>
+              <div>
+                Selected pumps: {bigOn} big, {smallOn} small (AI)
+              </div>
+              <div>Objective: minimise kWh/m³ within wear limits</div>
+              <button
+                type="button"
+                className="link-button"
+                onClick={() =>
+                  setShowDecisionDetails(prev => !prev)
+                }
+              >
+                {showDecisionDetails ? 'Hide details' : 'Show details'}
+              </button>
             </div>
-            <ul className="why-list">
-              <li>Commanded flow from high-level model: 12 000 m³/h.</li>
-              <li>Selected {bigOn} big pumps, {smallOn} small pumps at ~49 Hz.</li>
-              <li>Level at {level.toFixed(1)} m, well inside 0–8 m band.</li>
-              <li>Electricity price {price.toFixed(3)} €/kWh, minimizing kWh/m³.</li>
-              <li>Pumps chosen are those with lowest runtime to balance wear.</li>
-              <li>No pump switched earlier than 2 h since last toggle.</li>
-            </ul>
+            {showDecisionDetails && (
+              <ul className="why-list">
+                <li>Commanded flow from high-level model: 12 000 m³/h.</li>
+                <li>
+                  Selected {bigOn} big pumps, {smallOn} small pumps at ~49 Hz.
+                </li>
+                <li>Level at {level.toFixed(1)} m, well inside 0–8 m band.</li>
+                <li>
+                  Electricity price {price.toFixed(3)} €/kWh, minimizing kWh/m³.
+                </li>
+                <li>
+                  Pumps chosen are those with lowest runtime to balance wear.
+                </li>
+                <li>
+                  No pump switched earlier than 2 h since last toggle.
+                </li>
+              </ul>
+            )}
           </div>
         </section>
 
-        {/* Right column */}
+        {/* Middle column: pumps */}
         <section>
           <div className="card">
             <div className="card-header">
@@ -279,7 +812,164 @@ export default function Dashboard() {
             </div>
             <div className="pump-grid">
               {pumps.map(p => (
-                <PumpTile key={p.id} pump={p} mode={mode} />
+                <PumpTile
+                  key={p.id}
+                  pump={p}
+                  mode={mode}
+                  onClick={() => openPumpDetails(p.id)}
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Right column: status, alarms, events */}
+        <section>
+          {/* Status card */}
+          <div className="card" style={{ marginBottom: 12 }}>
+            <div className="card-header">
+              <div className="card-title">Status & comms</div>
+              <div className="card-subtitle">Data health & links</div>
+            </div>
+            <div className="status-block">
+              <div className="status-line">
+                <span className={`status-dot ${freshnessStatus}`} />
+                <span>
+                  Station state: {stationStateLabel}
+                  {stationStateDetail && ` (${stationStateDetail})`}
+                </span>
+              </div>
+              <div className="status-line" style={{ fontSize: 11 }}>
+                Last update: {lastUpdateTimeStr} ({ageLabel})
+              </div>
+              <div className="status-connections">
+                <div>Telemetry: {telemetryLabel}</div>
+                <div>SCADA link: {scadaLabel}</div>
+                <div>Tariff: {price.toFixed(3)} €/kWh (High)</div>
+                <div style={{ marginTop: 6 }}>System status:</div>
+                <div className="status-chips">
+                  <span className="constraint-chip ok">
+                    Level safe · 0–8 m
+                  </span>
+                  <span className="constraint-chip ok">
+                    Wear balanced
+                  </span>
+                  <span className="constraint-chip ok">
+                    Switching within limits
+                  </span>
+                  <span className="constraint-chip ok">
+                    F2{' '}
+                    {totalFlow.toLocaleString(undefined, {
+                      maximumFractionDigits: 0
+                    })}{' '}
+                    m³/h · limit 16 000
+                  </span>
+                  <span
+                    className={`constraint-chip ${
+                      flushedToday ? 'ok' : 'warn'
+                    }`}
+                  >
+                    Flush {flushedToday ? 'done today' : 'pending'}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Active alarms */}
+          <div className="card" id="alarms-panel" style={{ marginBottom: 12 }}>
+            <div className="card-header">
+              <div className="card-title">Active alarms</div>
+              <div className="card-subtitle">
+                {activeAlarms.length} active ·{' '}
+                {activeAlarms.filter(a => !a.acknowledgedBy).length} unack
+              </div>
+            </div>
+            <div className="alarms-table">
+              <div className="alarms-header-row">
+                <span>Sev</span>
+                <span>Asset</span>
+                <span>Message</span>
+                <span>Since</span>
+                <span>Acked by</span>
+                <span />
+              </div>
+              <div className="alarms-body">
+                {sortedActiveAlarms.map(alarm => {
+                  const severityCode =
+                    severityCodeMap[alarm.severity] || '?';
+                  return (
+                    <div
+                      key={alarm.id}
+                      className={`alarm-row ${
+                        alarm.acknowledgedBy ? 'acked' : 'unacked'
+                      } ${highlightedAlarmId === alarm.id ? 'new' : ''}`}
+                      onClick={() =>
+                        openLogsForContext({
+                          type: 'alarm',
+                          id: alarm.id
+                        })
+                      }
+                    >
+                      <span>
+                        <span
+                          className={`alarm-severity-tag alarm-severity-${alarm.severity.toLowerCase()}`}
+                        >
+                          {severityCode}
+                        </span>
+                      </span>
+                      <span>{alarm.assetId}</span>
+                      <span>{alarm.message}</span>
+                      <span>{formatSince(now, alarm.raisedAt)}</span>
+                      <span>{alarm.acknowledgedBy || '-'}</span>
+                      <span className="alarm-actions">
+                        <button
+                          className="link-button"
+                          disabled={!!alarm.acknowledgedBy}
+                          onClick={e => {
+                            e.stopPropagation();
+                            handleAcknowledge(alarm.id);
+                          }}
+                        >
+                          Ack
+                        </button>
+                        <button
+                          className="link-button"
+                          onClick={e => {
+                            e.stopPropagation();
+                            openLogsForContext({
+                              type: 'alarm',
+                              id: alarm.id
+                            });
+                          }}
+                        >
+                          Details
+                        </button>
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* Recent events */}
+          <div className="card">
+            <div className="card-header">
+              <div className="card-title">Recent events</div>
+            </div>
+            <div className="events-list">
+              {mockEvents.map(ev => (
+                <div
+                  key={ev.id}
+                  className="event-row"
+                  onClick={() =>
+                    openLogsForContext({ type: 'event', id: ev.id })
+                  }
+                >
+                  <span className="event-time">{ev.time}</span>
+                  <span className="event-text">{ev.text}</span>
+                </div>
               ))}
             </div>
           </div>
@@ -310,50 +1000,91 @@ export default function Dashboard() {
   );
 }
 
-function PumpTile({ pump, mode }) {
-  const statusLabel = !pump.isOn
-    ? 'OFF'
-    : pump.stepsSinceSwitch < 1
-    ? 'Cooldown'
-    : 'ON';
+function PumpTile({ pump, mode, onClick }) {
+  let state = 'off';
+  if (pump.healthStatus === 'out') state = 'oos';
+  else if (pump.isOn) state = 'on';
 
-  const statusClass = !pump.isOn
-    ? 'status-off'
-    : pump.stepsSinceSwitch < 1
-    ? 'status-cooldown'
-    : 'status-on';
+  let stateLabel = 'OFF';
+  let stateClass = 'status-off';
+
+  if (state === 'on') {
+    stateLabel = 'ON';
+    stateClass = 'status-on';
+  } else if (state === 'oos') {
+    stateLabel = 'OOS';
+    stateClass = 'status-oos';
+  }
+
+  const freqText = pump.isOn ? pump.freqHz.toFixed(1) : '0.0';
+  const flowText = pump.isOn ? pump.flowM3h.toFixed(0) : '0';
+  const powerText = pump.powerKw.toFixed(0);
+
+  // AI only when auto and pump not out of service
+  const isAIControlled = mode === 'auto' && pump.healthStatus !== 'out';
 
   return (
-    <div className={`pump-tile ${pump.isOn ? 'on' : ''}`}>
+    <div className="pump-tile" onClick={onClick}>
       <div className="pump-left">
         <div className={`pump-avatar ${pump.kind === 'big' ? 'big' : 'small'}`}>
           {pump.id}
         </div>
         <div className="pump-labels">
-          <div className="pump-main">
-            {pump.kind === 'big' ? 'Big pump' : 'Small pump'}
+          <div className="pump-header-row">
+            <span className="pump-main">
+              {pump.kind === 'big' ? 'Big pump' : 'Small pump'}
+            </span>
+            {isAIControlled && (
+              <span
+                className="pump-ai-chip"
+                title="Controlled by optimizer"
+              >
+                AI
+              </span>
+            )}
           </div>
           <div className="pump-sub">
             runtime {pump.runtimeHours.toFixed(0)} h · last switch{' '}
             {pump.stepsSinceSwitch * 15} min ago
           </div>
+          {pump.healthStatus === 'due' && (
+            <span className="pump-service-badge health-pill due">
+              ⚠ Service due soon
+            </span>
+          )}
+          {pump.healthStatus === 'out' && (
+            <span className="pump-service-badge health-pill out">
+              ⛔ Out of service
+            </span>
+          )}
         </div>
       </div>
 
       <div className="pump-right">
-        <div className={`status-chip ${statusClass}`}>{statusLabel}</div>
-        <div className="freq">
-          {pump.isOn ? pump.freqHz.toFixed(1) : '0.0'} Hz
+        <div className={`status-chip ${stateClass}`}>{stateLabel}</div>
+        <div className="pump-metrics-row">
+          {freqText} Hz · {flowText} m³/h · {powerText} kW
         </div>
-        <div className="flow">
-          {pump.isOn ? pump.flowM3h.toFixed(0) : 0} m³/h ·{' '}
-          {pump.powerKw.toFixed(0)} kW
+        <div className="pump-health-row">
+          <span>
+            Starts today:{' '}
+            {pump.startsToday != null ? pump.startsToday : 0}
+          </span>
+          <span>·</span>
+          <span>
+            Total starts:{' '}
+            {pump.totalStarts != null
+              ? pump.totalStarts.toLocaleString()
+              : '–'}
+          </span>
+          <span>·</span>
+          <span>
+            Next service:{' '}
+            {pump.hoursToService != null
+              ? `${pump.hoursToService} h`
+              : '–'}
+          </span>
         </div>
-        {mode === 'auto' ? (
-          <span className="tag">AI controlled</span>
-        ) : (
-          <span className="tag">Manual override available</span>
-        )}
       </div>
     </div>
   );
